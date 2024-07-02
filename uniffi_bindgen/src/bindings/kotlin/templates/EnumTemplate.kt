@@ -15,7 +15,6 @@ enum class {{ type_name }} {
     {%- call kt::docstring(variant, 4) %}
     {{ variant|variant_name }}{% if loop.last %};{% else %},{% endif %}
     {%- endfor %}
-    companion object
 }
 {% when Some with (variant_discr_type) %}
 enum class {{ type_name }}(val value: {{ variant_discr_type|type_name(ci) }}) {
@@ -23,7 +22,6 @@ enum class {{ type_name }}(val value: {{ variant_discr_type|type_name(ci) }}) {
     {%- call kt::docstring(variant, 4) %}
     {{ variant|variant_name }}({{ e|variant_discr_literal(loop.index0) }}){% if loop.last %};{% else %},{% endif %}
     {%- endfor %}
-    companion object
 }
 {% endmatch %}
 
@@ -62,9 +60,7 @@ sealed class {{ type_name }}{% if contains_object_references %}: Disposable {% e
         {%- call kt::docstring(field, 8) %}
         val {% call kt::field_name(field, loop.index) %}: {{ field|type_name(ci) }}{% if loop.last %}{% else %}, {% endif %}
         {%- endfor -%}
-    ) : {{ type_name }}() {
-        companion object
-    }
+    ) : {{ type_name }}()
     {%- endif %}
     {% endfor %}
 
@@ -84,7 +80,6 @@ sealed class {{ type_name }}{% if contains_object_references %}: Disposable {% e
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
     }
     {% endif %}
-    companion object
 }
 
 /**
