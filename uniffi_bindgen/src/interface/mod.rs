@@ -1083,13 +1083,25 @@ impl<'a> RecursiveTypeIterator<'a> {
                     self.ci.get_record_definition(name).map(Record::iter_types)
                 }
                 Type::Enum { name, .. } => self.ci.get_enum_definition(name).map(Enum::iter_types),
-                Type::Object { name, .. } => {
-                    self.ci.get_object_definition(name).map(Object::iter_types)
-                }
+                Type::Object { name, .. }
+                | Type::External {
+                    name,
+                    kind: ExternalKind::Interface,
+                    ..
+                } => self.ci.get_object_definition(name).map(Object::iter_types),
                 Type::CallbackInterface { name, .. } => self
                     .ci
                     .get_callback_interface_definition(name)
                     .map(CallbackInterface::iter_types),
+                Type::External {
+                    name,
+                    kind: ExternalKind::DataClass,
+                    ..
+                } => self
+                    .ci
+                    .get_record_definition(name)
+                    .map(Record::iter_types)
+                    .or_else(|| self.ci.get_enum_definition(name).map(Enum::iter_types)),
                 _ => None,
             };
             if let Some(next_iter) = next_iter {
